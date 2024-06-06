@@ -14,6 +14,9 @@ data class RocketResponse(
     @SerialName("cost_per_launch")
     val costPerLaunch: Int = 0,
 
+    @SerialName("country")
+    val country: String,
+
     @SerialName("first_flight")
     val firstFlightDate: String = "",
 

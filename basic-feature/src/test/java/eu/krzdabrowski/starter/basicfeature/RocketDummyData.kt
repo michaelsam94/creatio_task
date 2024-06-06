@@ -11,6 +11,7 @@ internal fun generateTestRocketFromRemote() = RocketResponse(
     firstFlightDate = "2022-09-10",
     wikiUrl = "https://testrocket.com",
     imageUrls = listOf("https://testrocket.com/1.jpg"),
+    country = "test",
 )
 
 internal fun generateTestRocketFromDomain() = Rocket(
@@ -22,4 +23,6 @@ internal fun generateTestRocketFromDomain() = Rocket(
     weight = 30_000,
     wikiUrl = "https://testrocket.com",
     imageUrl = "https://testrocket.com/1.jpg",
+    country = "test",
 )
+

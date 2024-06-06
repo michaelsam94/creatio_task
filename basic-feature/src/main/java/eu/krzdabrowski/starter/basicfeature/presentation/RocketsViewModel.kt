@@ -4,14 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eu.krzdabrowski.starter.basicfeature.domain.usecase.GetRocketsUseCase
 import eu.krzdabrowski.starter.basicfeature.domain.usecase.RefreshRocketsUseCase
-import eu.krzdabrowski.starter.basicfeature.presentation.RocketsEvent.OpenWebBrowserWithDetails
-import eu.krzdabrowski.starter.basicfeature.presentation.RocketsIntent.RefreshRockets
-import eu.krzdabrowski.starter.basicfeature.presentation.RocketsIntent.RocketClicked
-import eu.krzdabrowski.starter.basicfeature.presentation.RocketsUiState.PartialState
-import eu.krzdabrowski.starter.basicfeature.presentation.RocketsUiState.PartialState.Error
-import eu.krzdabrowski.starter.basicfeature.presentation.RocketsUiState.PartialState.Fetched
-import eu.krzdabrowski.starter.basicfeature.presentation.RocketsUiState.PartialState.Loading
 import eu.krzdabrowski.starter.basicfeature.presentation.mapper.toPresentationModel
+import eu.krzdabrowski.starter.basicfeature.presentation.model.RocketDisplayable
 import eu.krzdabrowski.starter.core.presentation.mvi.BaseViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -19,16 +13,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
-private const val HTTP_PREFIX = "http"
-private const val HTTPS_PREFIX = "https"
-
 @HiltViewModel
 class RocketsViewModel @Inject constructor(
     private val getRocketsUseCase: GetRocketsUseCase,
     private val refreshRocketsUseCase: RefreshRocketsUseCase,
     savedStateHandle: SavedStateHandle,
     rocketsInitialState: RocketsUiState,
-) : BaseViewModel<RocketsUiState, PartialState, RocketsEvent, RocketsIntent>(
+) : BaseViewModel<RocketsUiState, RocketsUiState.PartialState, RocketsEvent, RocketsIntent>(
     savedStateHandle,
     rocketsInitialState,
 ) {
@@ -36,25 +27,25 @@ class RocketsViewModel @Inject constructor(
         observeRockets()
     }
 
-    override fun mapIntents(intent: RocketsIntent): Flow<PartialState> = when (intent) {
-        is RefreshRockets -> refreshRockets()
-        is RocketClicked -> rocketClicked(intent.uri)
+    override fun mapIntents(intent: RocketsIntent): Flow<RocketsUiState.PartialState> = when (intent) {
+        is RocketsIntent.RefreshRockets -> refreshRockets()
+        is RocketsIntent.RocketClicked -> rocketClicked(intent.rocketName)
     }
 
     override fun reduceUiState(
         previousState: RocketsUiState,
-        partialState: PartialState,
+        partialState: RocketsUiState.PartialState,
     ): RocketsUiState = when (partialState) {
-        is Loading -> previousState.copy(
+        is RocketsUiState.PartialState.Loading -> previousState.copy(
             isLoading = true,
             isError = false,
         )
-        is Fetched -> previousState.copy(
+        is RocketsUiState.PartialState.Fetched -> previousState.copy(
             isLoading = false,
             rockets = partialState.list,
             isError = false,
         )
-        is Error -> previousState.copy(
+        is RocketsUiState.PartialState.Error -> previousState.copy(
             isLoading = false,
             isError = true,
         )
@@ -65,30 +56,28 @@ class RocketsViewModel @Inject constructor(
             .map { result ->
                 result.fold(
                     onSuccess = { rocketList ->
-                        Fetched(rocketList.map { it.toPresentationModel() })
+                        RocketsUiState.PartialState.Fetched(rocketList.map { it.toPresentationModel() })
                     },
                     onFailure = {
-                        Error(it)
+                        RocketsUiState.PartialState.Error(it)
                     },
                 )
             }
             .onStart {
-                emit(Loading)
+                emit(RocketsUiState.PartialState.Loading)
             },
     )
 
-    private fun refreshRockets(): Flow<PartialState> = flow<PartialState> {
+    private fun refreshRockets(): Flow<RocketsUiState.PartialState> = flow<RocketsUiState.PartialState> {
         refreshRocketsUseCase()
             .onFailure {
-                emit(Error(it))
+                emit(RocketsUiState.PartialState.Error(it))
             }
     }.onStart {
-        emit(Loading)
+        emit(RocketsUiState.PartialState.Loading)
     }
 
-    private fun rocketClicked(uri: String): Flow<PartialState> = flow {
-        if (uri.startsWith(HTTP_PREFIX) || uri.startsWith(HTTPS_PREFIX)) {
-            setEvent(OpenWebBrowserWithDetails(uri))
-        }
+    private fun rocketClicked(rocketName: String): Flow<RocketsUiState.PartialState> = flow {
+       setEvent(RocketsEvent.OpenRocketDetails(rocketName))
     }
 }

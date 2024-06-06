@@ -15,6 +15,7 @@ fun RocketResponse.toDomainModel() = Rocket(
     weight = weight.kg,
     wikiUrl = wikiUrl,
     imageUrl = imageUrls.random(),
+    country = country,
 )
 
 fun RocketCached.toDomainModel() = Rocket(
@@ -26,6 +27,7 @@ fun RocketCached.toDomainModel() = Rocket(
     weight = weight,
     wikiUrl = wikiUrl,
     imageUrl = imageUrl,
+    country = country,
 )
 
 fun Rocket.toEntityModel() = RocketCached(
@@ -37,4 +39,5 @@ fun Rocket.toEntityModel() = RocketCached(
     weight = weight,
     wikiUrl = wikiUrl,
     imageUrl = imageUrl,
+    country = country
 )

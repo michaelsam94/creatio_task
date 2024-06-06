@@ -73,6 +73,14 @@ fun RocketItem(
                 ),
                 style = Typography.bodyMedium,
             )
+
+            Text(
+                text = stringResource(
+                    id = R.string.rocket_country,
+                    rocket.country,
+                ),
+                style = Typography.bodyMedium,
+            )
         }
 
         AsyncImage(

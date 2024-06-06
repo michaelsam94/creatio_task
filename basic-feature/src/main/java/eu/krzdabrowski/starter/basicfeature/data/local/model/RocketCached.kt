@@ -15,6 +15,9 @@ data class RocketCached(
     @ColumnInfo(name = "cost_per_launch")
     val costPerLaunch: Int,
 
+    @ColumnInfo(name = "country")
+    val country: String,
+
     @ColumnInfo(name = "first_flight_date")
     val firstFlightDate: String,
 

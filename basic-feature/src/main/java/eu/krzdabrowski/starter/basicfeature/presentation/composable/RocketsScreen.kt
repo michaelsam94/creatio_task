@@ -19,22 +19,30 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import eu.krzdabrowski.starter.basicfeature.R
+import eu.krzdabrowski.starter.basicfeature.presentation.RocketsViewModel
+import eu.krzdabrowski.starter.basicfeature.presentation.model.RocketDisplayable
 import eu.krzdabrowski.starter.basicfeature.presentation.RocketsEvent
-import eu.krzdabrowski.starter.basicfeature.presentation.RocketsEvent.OpenWebBrowserWithDetails
 import eu.krzdabrowski.starter.basicfeature.presentation.RocketsIntent
 import eu.krzdabrowski.starter.basicfeature.presentation.RocketsIntent.RefreshRockets
 import eu.krzdabrowski.starter.basicfeature.presentation.RocketsIntent.RocketClicked
 import eu.krzdabrowski.starter.basicfeature.presentation.RocketsUiState
-import eu.krzdabrowski.starter.basicfeature.presentation.RocketsViewModel
+import eu.krzdabrowski.starter.core.navigation.NavigationCommand
+import eu.krzdabrowski.starter.core.navigation.NavigationDestination
+import eu.krzdabrowski.starter.core.navigation.NavigationManager
 import eu.krzdabrowski.starter.core.utils.collectWithLifecycle
 import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun RocketsRoute(
+    navController: NavController,
     viewModel: RocketsViewModel = hiltViewModel(),
 ) {
-    HandleEvents(viewModel.getEvents())
+
+    HandleEvents(navController,viewModel.getEvents())
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     RocketsScreen(
@@ -106,13 +114,11 @@ private fun HandlePullToRefresh(
 }
 
 @Composable
-private fun HandleEvents(events: Flow<RocketsEvent>) {
-    val uriHandler = LocalUriHandler.current
-
-    events.collectWithLifecycle {
-        when (it) {
-            is OpenWebBrowserWithDetails -> {
-                uriHandler.openUri(it.uri)
+private fun HandleEvents(navController: NavController,events: Flow<RocketsEvent>) {
+    events.collectWithLifecycle { event ->
+        when (event) {
+            is RocketsEvent.OpenRocketDetails -> {
+                navController.navigate("${NavigationDestination.RocketDetails.route}/${event.rocketName}")
             }
         }
     }

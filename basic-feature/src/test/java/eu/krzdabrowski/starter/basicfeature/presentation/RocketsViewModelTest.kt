@@ -5,7 +5,7 @@ import app.cash.turbine.test
 import eu.krzdabrowski.starter.basicfeature.domain.usecase.GetRocketsUseCase
 import eu.krzdabrowski.starter.basicfeature.domain.usecase.RefreshRocketsUseCase
 import eu.krzdabrowski.starter.basicfeature.generateTestRocketFromDomain
-import eu.krzdabrowski.starter.basicfeature.presentation.RocketsEvent.OpenWebBrowserWithDetails
+import eu.krzdabrowski.starter.basicfeature.presentation.RocketsEvent.OpenRocketDetails
 import eu.krzdabrowski.starter.basicfeature.presentation.RocketsIntent.RefreshRockets
 import eu.krzdabrowski.starter.basicfeature.presentation.RocketsIntent.RocketClicked
 import eu.krzdabrowski.starter.basicfeature.presentation.mapper.toPresentationModel
@@ -160,39 +160,25 @@ class RocketsViewModelTest {
     }
 
     @Test
-    fun `should open web browser if link has proper prefix`() = runTest {
+    fun `should open rocket details`() = runTest {
         // Given
-        val testUri = "https://testrocket.com"
+        val rocket = generateTestRocketFromDomain().toPresentationModel()
         every { getRocketsUseCase() } returns emptyFlow()
         setUpRocketsViewModel()
 
         // When
-        objectUnderTest.acceptIntent(RocketClicked(testUri))
+        objectUnderTest.acceptIntent(RocketClicked(rocket.name))
 
         // Then
         objectUnderTest.getEvents().test {
             assertEquals(
-                expected = OpenWebBrowserWithDetails(testUri),
+                expected = OpenRocketDetails(rocket.name),
                 actual = awaitItem(),
             )
         }
     }
 
-    @Test
-    fun `should not open web browser if link is incorrect`() = runTest {
-        // Given
-        val testUri = "incorrectlink.com"
-        every { getRocketsUseCase() } returns emptyFlow()
-        setUpRocketsViewModel()
 
-        // When
-        objectUnderTest.acceptIntent(RocketClicked(testUri))
-
-        // Then
-        objectUnderTest.getEvents().test {
-            expectNoEvents()
-        }
-    }
 
     private fun setUpRocketsViewModel(
         initialUiState: RocketsUiState = RocketsUiState(),

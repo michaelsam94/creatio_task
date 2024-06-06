@@ -38,15 +38,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidStarterTheme {
                 val navController = rememberNavController()
-
                 Scaffold(
                     topBar = { MainTopAppBar() },
                 ) {
                     NavigationHost(
                         modifier = Modifier
                             .padding(it),
-                        navController = navController,
                         factories = navigationFactories,
+                        navController = navController,
                     )
                 }
 

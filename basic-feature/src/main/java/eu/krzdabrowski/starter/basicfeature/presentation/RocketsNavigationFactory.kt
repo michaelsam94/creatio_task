@@ -1,5 +1,6 @@
 package eu.krzdabrowski.starter.basicfeature.presentation
 
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import eu.krzdabrowski.starter.basicfeature.presentation.composable.RocketsRoute
@@ -9,9 +10,9 @@ import javax.inject.Inject
 
 class RocketsNavigationFactory @Inject constructor() : NavigationFactory {
 
-    override fun create(builder: NavGraphBuilder) {
+    override fun create(builder: NavGraphBuilder,navController: NavController) {
         builder.composable(Rockets.route) {
-            RocketsRoute()
+            RocketsRoute(navController)
         }
     }
 }

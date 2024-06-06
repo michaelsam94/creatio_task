@@ -31,7 +31,7 @@ fun RocketsListContent(
         ) { index, item ->
             RocketItem(
                 rocket = item,
-                onRocketClick = { onRocketClick(item.wikiUrl) },
+                onRocketClick = { onRocketClick(item.name) },
             )
 
             if (index < rocketList.lastIndex) {
